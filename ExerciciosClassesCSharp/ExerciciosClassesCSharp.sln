@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaDeCadastroComListage
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaDeCadastroDeCarro", "SistemaDeCadastroDeCarro\SistemaDeCadastroDeCarro.csproj", "{CE897E27-3D28-45F6-92DC-39730261799D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExerciciosMarcelo", "ExerciciosMarcelo\ExerciciosMarcelo.csproj", "{0EFE7C16-D992-4F33-B673-F5912D5F9B99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{CE897E27-3D28-45F6-92DC-39730261799D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE897E27-3D28-45F6-92DC-39730261799D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE897E27-3D28-45F6-92DC-39730261799D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EFE7C16-D992-4F33-B673-F5912D5F9B99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EFE7C16-D992-4F33-B673-F5912D5F9B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EFE7C16-D992-4F33-B673-F5912D5F9B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EFE7C16-D992-4F33-B673-F5912D5F9B99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

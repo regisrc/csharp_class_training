@@ -45,7 +45,7 @@ namespace SistemaDeCadastroDeCarro
                     Console.Clear();
                 }
             }
-            listaCarros.ForEach(i => Console.WriteLine($" Marca: {i.Marca} \n\r Modelo: {i.Modelo} \n\r Ano: {i.Ano} \n\r Placa: {i.Placa} \n\r Valor: {i.Valor.ToString("C2",CultureInfo.CreateSpecificCulture("pt-BR"))} \n"));
+            listaCarros.ForEach(i => Console.WriteLine($" Marca: {i.Marca} \n\r Modelo: {i.Modelo} \n\r Ano: {i.Ano} \n\r Placa: {i.Placa} \n\r Valor: {i.Valor.ToString("C2", CultureInfo.CreateSpecificCulture("pt-BR"))} \n"));
         }
         public static void EndApp()
         {
@@ -67,71 +67,96 @@ namespace SistemaDeCadastroDeCarro
         }
         public static int ReturnAno()
         {
-            Int16 variavel = 0;
+            string variavel = "";
             bool flag = true;
             while (flag)
             {
                 Console.Write("Digite o ano do carro: ");
-                variavel = Int16.Parse(Console.ReadLine());
-                if (variavel >= DateTime.Now.Year - 100 && variavel <= DateTime.Now.Year)
-                    flag = false;
+                variavel = Console.ReadLine();
+                if (TestingCaracters(variavel, 0))
+                {
+                    if (int.Parse(variavel) >= DateTime.Now.Year - 100 && int.Parse(variavel) <= DateTime.Now.Year)
+                        flag = false;
+                    else
+                        ShowError(flag, "o Ano");
+                }
                 else
-                    Console.WriteLine("Digite corretamente!");
+                    ShowError(flag, "o Ano");
             }
-            return variavel;
+            return int.Parse(variavel);
         }
+
+        /// <summary>
+        /// Metodo para formatar a placa (nova ou antiga)
+        /// </summary>
+        /// <returns>Placa formatada</returns>
         public static string ReturnPlaca()
         {
-            string variavel = "";
+            string placa = "";
             bool flag = true;
-            bool isWorking = true;
+            bool error = false;
             while (flag)
             {
                 Console.Write("Digite a placa do carro: ");
-                variavel = Console.ReadLine().Replace("-", "");
-                variavel = variavel.Trim();
-                if (variavel.Length == 7)
+                placa = Console.ReadLine().Replace("-", "").Replace(" ", "");
+                if (placa.Length == 7)
                 {
-                    for (int i = 0; i < 3; i++)
+                    if (TestingCaracters(placa.Substring(0, 3), 1) && TestingCaracters(placa.Substring(placa.Length - 2), 0))
                     {
-                        Int32.TryParse(variavel[i].ToString(), out int num);
-                        if (num != 0)
-                        {
-                            isWorking = false;
-                        }
-                        if (isWorking == false)
-                            i = variavel.Length;
-                    }
-                    for (int i = variavel.Length - 1; i > 4; i--)
-                    {
-
-                        if (!Int32.TryParse(variavel[i].ToString(), out int num))
-                        {
-                            isWorking = false;
-                        }
-                        if (isWorking == false)
-                            i = 0;
-                    }
-                    if (isWorking)
-                    {
-                        if (!Int32.TryParse(variavel.Substring(4, 1), out int numero) && Int32.TryParse(variavel.Substring(3, 1), out int nume))
+                        if (TestingCaracters(placa.Substring(3, 1), 0) && TestingCaracters(placa.Substring(4, 1), 1))
                             flag = false;
-                        else if (Int32.TryParse(variavel.Substring(4, 1), out int numer) && Int32.TryParse(variavel.Substring(3, 1), out int numeros))
+                        else if (TestingCaracters(placa.Substring(3, 1), 0) && TestingCaracters(placa.Substring(4, 1), 0))
                         {
-                            variavel = $"{variavel.Substring(0, 3)}-{variavel.Substring(3)}";
                             flag = false;
+                            placa = $"{placa.Substring(0, 3)}-{placa.Substring(3)}";
                         }
+                        else
+                            error = true;
                     }
                     else
-                    {
-                        Console.WriteLine("Digite corretamente");
-                    }
+                        error = true;
                 }
                 else
-                    Console.WriteLine("Digite corretamente!");
+                    error = true;
+                error = ShowError(error, "a Placa");
             }
-            return variavel.ToUpper();
+            return placa.ToUpper();
         }
+
+        /// <summary>
+        /// Classe para teste de caracteres
+        /// </summary>
+        /// <param name="palavra">Palavra a ser testada (Utilizar substring e/ou toString)</param>
+        /// <param name="type">0 - int, 1 - string</param>
+        /// <returns>Retorna se a palavra testada tem todas as letras iguais ao tipo</returns>
+        public static bool TestingCaracters(string palavra, int type)
+        {
+            var QuantidadeCaracteres = 0;
+            for (int i = 0; i < palavra.Length; i++)
+            {
+                switch (type)
+                {
+                    case 0:
+                        if (Char.IsNumber(palavra, i))
+                            QuantidadeCaracteres++;
+                        break;
+                    case 1:
+                        if (!Char.IsNumber(palavra, i))
+                            QuantidadeCaracteres++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return QuantidadeCaracteres == palavra.Length;
+        }
+
+        public static bool ShowError(bool IfError, string contexto)
+        {
+            if (IfError) Console.WriteLine($"Digite {contexto} corretamente");
+            return false;
+        }
+
         public static double ReturnValor()
         {
             int variavel = 0;
