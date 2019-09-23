@@ -8,7 +8,7 @@ namespace LocacaoBiblioteca.Model
 {
     public class UserControls
     {
-        public bool Ativo { get; set; }
+        public bool Ativo { get; set; } = true;
         public int UsuarioCriacao { get; set; }
         public int UsuarioAlteracao { get; set; }
         public DateTime DataCriacao { get; set; }

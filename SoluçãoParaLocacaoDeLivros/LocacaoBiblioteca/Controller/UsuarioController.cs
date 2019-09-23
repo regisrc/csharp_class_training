@@ -11,12 +11,15 @@ namespace LocacaoBiblioteca.Controller
             {
                 new Usuarios()
                 {
+                    Id = UsuarioController.Id++,
                     Login = "admin",
-                    Senha = "admin"
+                    Senha = "admin",
+                    Ativo = true
                 }
             };
         }
 
+        public static int Id { get; set; }
         public List<Usuarios> ListaUsuarios { get; set; }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace LocacaoBiblioteca.Controller
             ListaLivros = new List<Livros>();
         }
 
-
+        public static int Id { get; set; }
         public List<Livros> ListaLivros { get; set; }
     }
 
