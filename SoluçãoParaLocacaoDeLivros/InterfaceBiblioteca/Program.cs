@@ -9,7 +9,6 @@ namespace InterfaceBiblioteca
     {
         public static LivrosController livroC = new LivrosController();
         public static UsuarioController usuC = new UsuarioController();
-        public static string usuarioLogado;
 
         static void Main(string[] args)
         {
@@ -39,7 +38,7 @@ namespace InterfaceBiblioteca
             if (usuC.VerifyAllLoginPassword(usuario: usuario))
             {
                 Console.WriteLine("Logado");
-                usuarioLogado = usuario.Login;
+                LocacaoContext.usuarioLogado = usuario.Login;
                 ShowSystemMenu();
             }
             else
@@ -77,7 +76,7 @@ namespace InterfaceBiblioteca
         {
             Console.Clear();
             Console.WriteLine("SISTEMA DE LOCAÇÃO DE LIVRO 1.0");
-            Console.WriteLine($"MENU SISTEMA - BEM VINDO - {usuarioLogado}");
+            Console.WriteLine($"MENU SISTEMA - BEM VINDO - {LocacaoContext.usuarioLogado}");
             Console.WriteLine("7 - Remover Usuário");
             Console.WriteLine("6 - Remover Livro");
             Console.WriteLine("5 - Cadastrar Usuários");
@@ -94,32 +93,36 @@ namespace InterfaceBiblioteca
                     ShowLogin();
                     break;
                 case "2":
-                    ListUsuarios();
+                    usuC.ListUsuarios();
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
                 case "3":
-                    ListLivros();
+                    livroC.ListLivros();
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
                 case "4":
-                    RegisterLivros();
+                    livroC.RegisterLivros();
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
                 case "5":
-                    RegisterUsuarios();
+                    usuC.RegisterUsuarios();
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
                 case "6":
-                    ExcluirLivro();
+                    livroC.ExcluirLivro();
+                    Console.ReadKey();
+                    livroC.ListLivros();
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
                 case "7":
-                    ExcluirUsuario();
+                    usuC.ExcluirUsuario();
+                    Console.ReadKey();
+                    usuC.ListUsuarios();
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
@@ -127,183 +130,6 @@ namespace InterfaceBiblioteca
                     break;
             }
         }
-
-        private static void RegisterLivros()
-        {
-            Console.Clear();
-            Console.WriteLine("------ CADASTRO DE LIVROS ------");
-            Console.Write("Digite o nome do livro: ");
-            livroC.ListaLivros.Add(new Livros()
-            {
-                Id = LivrosController.Id,
-                Nome = Console.ReadLine(),
-                Ativo = true
-            });
-            LivrosController.Id++;
-            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
-        }
-
-        private static void ExcluirLivro()
-        {
-            Console.Clear();
-            Console.WriteLine("------ REMOÇÃO DE LIVROS ------");
-            if (livroC.ListaLivros.Count != 0)
-            {
-                Console.Write("Digite o nome do livro: ");
-                var livroItem = Console.ReadLine();
-                bool removed = false;
-                foreach (var item in livroC.ListaLivros)
-                {
-                    if (item.Nome == livroItem)
-                    {
-                        removed = true;
-                        item.Ativo = false;
-                        break;
-                    }
-                }
-                if (removed)
-                    Console.WriteLine($"Livro: {livroItem} foi excluido com sucesso!");
-                else
-                    Console.WriteLine($"Livro: {livroItem} não foi encontrado!");
-            }
-            else
-            {
-                Console.WriteLine("NÃO EXISTEM LIVROS CADASTRADOS");
-            }
-            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
-        }
-
-        private static void ExcluirUsuario()
-        {
-            Console.Clear();
-            Console.WriteLine("------ REMOÇÃO DE USUÁRIOS ------");
-            Console.Write("Digite o login do usuário: ");
-            var usuarioItem = Console.ReadLine();
-            bool removed = false;
-            bool usuLogado = false;
-            foreach (var item in usuC.ListaUsuarios)
-            {
-                if (item.Login == usuarioItem)
-                {
-                    if (item.Login != usuarioLogado)
-                    {
-                        removed = true;
-                        item.Ativo = false;
-                        break;
-                    }
-                    else
-                    {
-                        usuLogado = true;
-                        break;
-                    }
-                }
-            }
-            if (usuLogado)
-                Console.WriteLine($"Usuário: {usuarioLogado} não pode ser excluido pois está em uso!");
-            else
-            {
-                if (removed)
-                    Console.WriteLine($"Usuário: {usuarioItem} foi excluido com sucesso!");
-                else
-                    Console.WriteLine($"Usuário: {usuarioItem} não foi encontrado!");
-            }
-            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
-        }
-
-        private static void ListLivros()
-        {
-            Console.Clear();
-            Console.WriteLine("------ LISTAGEM DE LIVROS ------");
-            if (livroC.ListaLivros == null || livroC.ListaLivros.Count == 0 || IsAllRemoved())
-                Console.WriteLine("Não existem livros cadastrados!");
-            else
-            {
-                livroC.ListaLivros.ForEach(i => ReturnLivroIDLogin(i));
-            }
-            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
-        }
-
-        private static bool IsAllRemoved()
-        {
-            foreach (var item in livroC.ListaLivros)
-            {
-                if (item.Ativo == true)
-                    return false;
-            }
-            return true;
-        }
-
-        private static void ReturnLivroIDLogin(Livros livro)
-        {
-            if (livro.Ativo == true)
-                Console.WriteLine($"ID: {livro.Id} NOME: {livro.Nome}");
-
-        }
-
-        private static void ReturnUsuarioIDLogin(Usuarios usuario)
-        {
-            if(usuario.Ativo == true)
-                Console.WriteLine(usuario.Login == usuarioLogado ? $"ID: {usuario.Id} / USUÁRIO: {usuario.Login} -> USUÁRIO LOGADO" : $"ID: {usuario.Id} / USUÁRIO: {usuario.Login}");
-        }
-
-        private static void ListUsuarios()
-        {
-            Console.Clear();
-            Console.WriteLine("------ LISTAGEM DE USUÁRIOS ------");
-            if (usuC.ListaUsuarios == null || usuC.ListaUsuarios.Count == 0)
-                Console.WriteLine("Não existem usuários cadastrados!");
-            else
-            {
-                usuC.ListaUsuarios.ForEach(i => ReturnUsuarioIDLogin(i));
-            }
-            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
-        }
-
-        private static void RegisterUsuarios()
-        {
-            Console.Clear();
-            Console.WriteLine("------ CADASTRO DE USUÁRIOS ------");
-
-            usuC.ListaUsuarios.Add(new Usuarios()
-            {
-                Id = UsuarioController.Id,
-                Login = TakeLoginUsuario(),
-                Senha = TakePasswordUsuario(),
-                Ativo = true
-            });
-
-            UsuarioController.Id++;
-            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
-        }
-
-        private static string TakeLoginUsuario()
-        {
-            var login = "";
-            var flag = true;
-            while (flag)
-            {
-                flag = false;
-                Console.Write("Digite o login do usuário: ");
-                login = Console.ReadLine();
-                foreach (var item in usuC.ListaUsuarios)
-                {
-                    if (item.Login == login)
-                    {
-                        flag = true;
-                        Console.WriteLine("Já existe um usuário com esse login, tente com outro login");
-                        break;
-                    }
-                }
-            }
-            return login;
-        }
-
-        private static string TakePasswordUsuario()
-        {
-            Console.Write("Digite a senha do usuário: ");
-            return Console.ReadLine();
-        }
-
 
     }
 }
