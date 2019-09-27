@@ -13,13 +13,27 @@ namespace Exercicio01.Controller
 
         public static void StartApp()
         {
+            CarrosController.ReadExcel();
             do
             {
                 Console.Clear();
-                CarrosController.ReadExcel();
                 ShowInfos(listaCarro);
                 ShowMenu();
             } while (TryAgain());
+        }
+
+        private static void GerarRelatorio(List<Carros> carros)
+        {
+            Console.WriteLine("Gostaria de tirar um relátorio? (1 para sim)");
+            if(Console.ReadKey().KeyChar.ToString() == "1")
+                CarrosController.ExportExcel(carros);
+        }
+
+        private static void GerarHTML(List<Carros> carros)
+        {
+            Console.WriteLine("Gostaria de tirar um relátorio? (1 para sim)");
+            if (Console.ReadKey().KeyChar.ToString() == "1")
+                CarrosController.ExportHTML(carros);
         }
 
         private static bool TryAgain()
@@ -61,6 +75,9 @@ namespace Exercicio01.Controller
             ShowInfos(mesesVenda);
             ShowSumPerMonth(mesesVenda);
             ShowAveragePerMonth(mesesVenda);
+            GerarHTML(mesesVenda);
+            mesesVenda.Clear();
+            Console.Clear();
         }
 
         private static void ShowSumPerMonth(List<Carros> listaCarros)
