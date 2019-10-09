@@ -9,23 +9,20 @@ namespace LocacaoBiblioteca.Controller
 {
     public class LivrosController
     {
-        public LivrosController()
-        {
-            LocacaoContext.ListaLivros = new List<Livros>();
-        }
+        static LivrosContextDB LivrosDB = new LivrosContextDB();
 
-        public static int Id { get; set; }
+        public IQueryable<Livros> GetLivros() => LivrosDB.Livros.Where(x => x.Ativo == true);
+
 
         private static bool IsAllRemoved()
         {
-            foreach (var item in LocacaoContext.ListaLivros)
+            foreach (var item in LivrosDB.Livros.ToList<Livros>())
             {
                 if (item.Ativo == true)
                     return false;
             }
             return true;
         }
-
         private static void ReturnLivroIDLogin(Livros livro)
         {
             if (livro.Ativo == true)
@@ -37,47 +34,77 @@ namespace LocacaoBiblioteca.Controller
         {
             Console.Clear();
             Console.WriteLine("------ LISTAGEM DE LIVROS ------");
-            if (LocacaoContext.ListaLivros == null || LocacaoContext.ListaLivros.Count == 0 || IsAllRemoved())
+            if (LivrosDB.Livros == null || LivrosDB.Livros.ToList<Livros>().Count == 0 || IsAllRemoved())
                 Console.WriteLine("Não existem livros cadastrados!");
             else
             {
-                LocacaoContext.ListaLivros.ForEach(i => ReturnLivroIDLogin(i));
+                LivrosDB.Livros.ToList<Livros>().ForEach(i => ReturnLivroIDLogin(i));
             }
             Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
         }
 
-        public void RegisterLivros()
+        public void RegisterLivros(int usuarioLogado)
         {
             Console.Clear();
             Console.WriteLine("------ CADASTRO DE LIVROS ------");
             Console.Write("Digite o nome do livro: ");
-            LocacaoContext.ListaLivros.Add(new Livros()
+            LivrosDB.Livros.Add(new Livros()
             {
-                Id = LivrosController.Id,
                 Nome = Console.ReadLine(),
-                Ativo = true
+                UsuarioAlteracao = usuarioLogado,
+                UsuarioCriacao = usuarioLogado
             });
-            LivrosController.Id++;
+            LivrosDB.SaveChanges();
             Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
+        }
+
+        public void UpdateLivros(int usuarioLogado)
+        {
+            var semDados = 0;
+            foreach (var item in LivrosDB.Livros.ToList<Livros>())
+            {
+                if (item.Ativo == true)
+                {
+                    semDados++;
+                }
+            }
+            if (semDados > 0)
+            {
+                Console.Clear();
+                Console.WriteLine("------ ATUALIZAÇÃO DE LIVROS ------");
+                Console.Write("Digite o antigo nome do livro: ");
+                var Nome = Console.ReadLine();
+                Console.Write("Digite o novo nome do livro: ");
+                var NomeNovo = Console.ReadLine();
+                var livro = LivrosDB.Livros.FirstOrDefault(i => i.Ativo == true && i.Nome == Nome);
+                if (livro != null)
+                {
+                    livro.Nome = NomeNovo;
+                    livro.UsuarioAlteracao = usuarioLogado;
+                    livro.UsuarioCriacao = usuarioLogado;
+                    LivrosDB.SaveChanges();
+                }
+                else
+                    Console.WriteLine("NÃO FOI ENCONTRADO UM LIVRO COM ESSE NOME!");
+                Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
+            }
         }
 
         public void ExcluirLivro()
         {
             Console.Clear();
             Console.WriteLine("------ REMOÇÃO DE LIVROS ------");
-            if (LocacaoContext.ListaLivros.Count != 0)
+            if (LivrosDB.Livros.ToList<Livros>().Count != 0)
             {
                 Console.Write("Digite o nome do livro: ");
                 var livroItem = Console.ReadLine();
                 bool removed = false;
-                foreach (var item in LocacaoContext.ListaLivros)
+                var livro = LivrosDB.Livros.FirstOrDefault(i => i.Nome == livroItem);
+                if (livro != null)
                 {
-                    if (item.Nome == livroItem)
-                    {
-                        removed = true;
-                        item.Ativo = false;
-                        break;
-                    }
+                    removed = true;
+                    livro.Ativo = false;
+                    LivrosDB.SaveChanges();
                 }
                 if (removed)
                     Console.WriteLine($"Livro: {livroItem} foi excluido com sucesso!");

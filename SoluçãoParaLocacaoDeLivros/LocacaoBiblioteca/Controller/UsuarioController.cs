@@ -1,27 +1,16 @@
 ﻿using LocacaoBiblioteca.Model;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace LocacaoBiblioteca.Controller
 {
     public class UsuarioController
     {
-        public UsuarioController()
-        {
-            LocacaoContext.ListaUsuarios = new List<Usuarios>
-            {
-                new Usuarios()
-                {
-                    Id = UsuarioController.Id++,
-                    Login = "admin",
-                    Senha = "admin",
-                    Ativo = true
-                }
-            };
-        }
 
-        public static int Id { get; set; }
-        
+        static LivrosContextDB UsuarioDB = new LivrosContextDB();
+
+        public IQueryable<Usuarios> GetUsuarios() => UsuarioDB.Usuarios.Where(x => x.Ativo == true);
 
         /// <summary>
         /// Metodo para realizar o login no sistema, login padrão:
@@ -32,7 +21,7 @@ namespace LocacaoBiblioteca.Controller
         /// <param name="senha">Senha do usuário dentro do sistema</param>
         /// <returns>Retorna se login e senha condizem com o cadastrado</returns>
 
-        public bool VerifyAllLoginPassword(Usuarios usuario) => LocacaoContext.ListaUsuarios.Exists(x => x.Login == usuario.Login && x.Senha == usuario.Senha);
+        public bool VerifyAllLoginPassword(Usuarios usuario) => UsuarioDB.Usuarios.ToList<Usuarios>().Exists(x => x.Login == usuario.Login && x.Senha == usuario.Senha);
 
         public void ExcluirUsuario()
         {
@@ -42,21 +31,52 @@ namespace LocacaoBiblioteca.Controller
             var usuarioItem = Console.ReadLine();
             bool removed = false;
             bool usuLogado = false;
-            foreach (var item in LocacaoContext.ListaUsuarios)
+            var usuario = UsuarioDB.Usuarios.FirstOrDefault(i => i.Login == usuarioItem);
+            if (usuario != null)
             {
-                if (item.Login == usuarioItem)
+                if (usuario.Login != LocacaoContext.usuarioLogado)
                 {
-                    if (item.Login != LocacaoContext.usuarioLogado)
-                    {
-                        removed = true;
-                        item.Ativo = false;
-                        break;
-                    }
-                    else
-                    {
-                        usuLogado = true;
-                        break;
-                    }
+                    removed = true;
+                    usuario.Ativo = false;
+                    UsuarioDB.SaveChanges();
+                }
+                else
+                {
+                    usuLogado = true;
+                }   
+            }       
+            if (usuLogado)
+                Console.WriteLine($"Usuário: {LocacaoContext.usuarioLogado} não pode ser excluido pois está em uso!");
+            else
+            {
+                if (removed)
+                    Console.WriteLine($"Usuário: {usuarioItem} foi excluido com sucesso!");
+                else
+                    Console.WriteLine($"Usuário: {usuarioItem} não foi encontrado!");
+            }
+            Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
+        }
+
+        public void AtualizarUsuario()
+        {
+            Console.Clear();
+            Console.WriteLine("------ ATULIZAÇÃO DE USUÁRIOS ------");
+            Console.Write("Digite o login do usuário: ");
+            var usuarioItem = Console.ReadLine();
+            bool removed = false;
+            bool usuLogado = false;
+            var usuario = UsuarioDB.Usuarios.FirstOrDefault(i => i.Login == usuarioItem);
+            if (usuario != null)
+            {
+                if (usuario.Login != LocacaoContext.usuarioLogado)
+                {
+                    removed = true;
+                    usuario.Ativo = false;
+                    UsuarioDB.SaveChanges();
+                }
+                else
+                {
+                    usuLogado = true;
                 }
             }
             if (usuLogado)
@@ -81,29 +101,29 @@ namespace LocacaoBiblioteca.Controller
         {
             Console.Clear();
             Console.WriteLine("------ LISTAGEM DE USUÁRIOS ------");
-            if (LocacaoContext.ListaUsuarios == null || LocacaoContext.ListaUsuarios.Count == 0)
+            if (UsuarioDB.Usuarios.ToList<Usuarios>() == null || UsuarioDB.Usuarios.ToList<Usuarios>().Count == 0)
                 Console.WriteLine("Não existem usuários cadastrados!");
             else
             {
-                LocacaoContext.ListaUsuarios.ForEach(i => ReturnUsuarioIDLogin(i));
+                UsuarioDB.Usuarios.ToList<Usuarios>().ForEach(i => ReturnUsuarioIDLogin(i));
             }
             Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
         }
 
-        public void RegisterUsuarios()
+        public void RegisterUsuarios(int usuarioLogado)
         {
             Console.Clear();
             Console.WriteLine("------ CADASTRO DE USUÁRIOS ------");
 
-            LocacaoContext.ListaUsuarios.Add(new Usuarios()
+            UsuarioDB.Usuarios.Add(new Usuarios()
             {
-                Id = UsuarioController.Id,
                 Login = TakeLoginUsuario(),
                 Senha = TakePasswordUsuario(),
-                Ativo = true
+                Ativo = true,
+                UsuarioAlteracao = usuarioLogado,
+                UsuarioCriacao = usuarioLogado
             });
-
-            UsuarioController.Id++;
+            UsuarioDB.SaveChanges();
             Console.WriteLine("------ PRESSIONE QUALQUER TECLA PARA SAIR ------");
         }
 
@@ -116,7 +136,7 @@ namespace LocacaoBiblioteca.Controller
                 flag = false;
                 Console.Write("Digite o login do usuário: ");
                 login = Console.ReadLine();
-                foreach (var item in LocacaoContext.ListaUsuarios)
+                foreach (var item in UsuarioDB.Usuarios.ToList<Usuarios>())
                 {
                     if (item.Login == login)
                     {

@@ -39,6 +39,7 @@ namespace InterfaceBiblioteca
             {
                 Console.WriteLine("Logado");
                 LocacaoContext.usuarioLogado = usuario.Login;
+                LocacaoContext.idUsuarioLogado = usuario.Id;
                 ShowSystemMenu();
             }
             else
@@ -77,6 +78,8 @@ namespace InterfaceBiblioteca
             Console.Clear();
             Console.WriteLine("SISTEMA DE LOCAÇÃO DE LIVRO 1.0");
             Console.WriteLine($"MENU SISTEMA - BEM VINDO - {LocacaoContext.usuarioLogado}");
+            Console.WriteLine("9 - Atualizar Usuário");
+            Console.WriteLine("8 - Atualizar Livro");
             Console.WriteLine("7 - Remover Usuário");
             Console.WriteLine("6 - Remover Livro");
             Console.WriteLine("5 - Cadastrar Usuários");
@@ -103,12 +106,12 @@ namespace InterfaceBiblioteca
                     ShowSystemMenu();
                     break;
                 case "4":
-                    livroC.RegisterLivros();
+                    livroC.RegisterLivros(LocacaoContext.idUsuarioLogado);
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
                 case "5":
-                    usuC.RegisterUsuarios();
+                    usuC.RegisterUsuarios(LocacaoContext.idUsuarioLogado);
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;
@@ -123,6 +126,12 @@ namespace InterfaceBiblioteca
                     usuC.ExcluirUsuario();
                     Console.ReadKey();
                     usuC.ListUsuarios();
+                    Console.ReadKey();
+                    ShowSystemMenu();
+                    break;
+                case "8":
+                    livroC.UpdateLivros(LocacaoContext.idUsuarioLogado);
+                    livroC.ListLivros();   
                     Console.ReadKey();
                     ShowSystemMenu();
                     break;

@@ -14,6 +14,8 @@ namespace LocacaoBiblioteca.Model
 
         public static string usuarioLogado;
 
+        public static int idUsuarioLogado;
+
 
     }
 }
